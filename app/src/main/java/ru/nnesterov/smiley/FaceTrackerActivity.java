@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -260,6 +261,19 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         }
     }
 
+    private void takeShot() {
+        mPreview.stop();
+        mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("image/jpeg");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, bytes);
+                startActivity(Intent.createChooser(shareIntent, ""));
+            }
+        });
+    }
+
     //==============================================================================================
     // Graphic Face Tracker
     //==============================================================================================
@@ -280,6 +294,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
      * associated face overlay.
      */
     private class GraphicFaceTracker extends Tracker<Face> {
+        private static final double SMILING_THRESHOLD = 0.4;
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
 
@@ -302,8 +317,17 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
+            boolean isSmiling = face.getIsSmilingProbability() > SMILING_THRESHOLD;
+            if (isSmiling) {
+                float leftEye = face.getIsLeftEyeOpenProbability();
+                float rightEye = face.getIsRightEyeOpenProbability();
+                if (Math.abs(leftEye - rightEye) >= 0.5) {
+                    takeShot();
+                }
+            }
+
+            mFaceGraphic.setIsReady(isSmiling);
             mFaceGraphic.updateFace(face);
-            mFaceGraphic.setmIsReady(face.getIsSmilingProbability() > 0.6);
         }
 
         /**
@@ -324,5 +348,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
         }
+
     }
 }

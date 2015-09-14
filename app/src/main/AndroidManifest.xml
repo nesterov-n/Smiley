@@ -18,7 +18,7 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/icon"
         android:theme="@style/Theme.AppCompat"
-        android:label="FaceTracker">
+        android:label="Smiley">
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
@@ -30,7 +30,7 @@
         <activity
             android:name=".FaceTrackerActivity"
             android:icon="@drawable/icon"
-            android:label="Face Tracker"
+            android:label="Smiley"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="fullSensor">
             <intent-filter>

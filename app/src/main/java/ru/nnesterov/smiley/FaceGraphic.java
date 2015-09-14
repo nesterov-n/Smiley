@@ -61,7 +61,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     }
 
 
-    void setmIsReady(boolean isValid) {
+    void setIsReady(boolean isValid) {
         this.mIsReady = isValid;
         mPaint.setColor(isValid ? VALID_COLOR : INVALID_COLOR);
     }
@@ -92,7 +92,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mPaint);
         canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mPaint);
         canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mPaint);
-        canvas.drawText("left eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mPaint);
+        canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mPaint);
 
             canvas.drawText(mIsReady ? mReadyMessage : mNotReadyMessage, 50.0f, 50.0f, mPaint);
 
