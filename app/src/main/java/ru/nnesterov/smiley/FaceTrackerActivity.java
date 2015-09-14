@@ -304,6 +304,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
      */
     private class GraphicFaceTracker extends Tracker<Face> {
         private static final double SMILING_THRESHOLD = 0.4;
+        private static final double WINK_THRESHOLD = 0.5;
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
 
@@ -330,7 +331,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             if (isSmiling) {
                 float leftEye = face.getIsLeftEyeOpenProbability();
                 float rightEye = face.getIsRightEyeOpenProbability();
-                if (Math.abs(leftEye - rightEye) >= 0.5) {
+                if (Math.abs(leftEye - rightEye) >= WINK_THRESHOLD) {
                     takeShot();
                 }
             }

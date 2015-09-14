@@ -28,10 +28,8 @@ import ru.nnesterov.smiley.ui.camera.GraphicOverlay;
  * graphic overlay view.
  */
 class FaceGraphic extends GraphicOverlay.Graphic {
-    private static final float FACE_POSITION_RADIUS = 10.0f;
     private static final float ID_TEXT_SIZE = 60.0f;
-    private static final float ID_Y_OFFSET = 50.0f;
-    private static final float ID_X_OFFSET = -50.0f;
+    private static final float LABEL_Y_OFFSET = 50.0f;
     private static final float BOX_STROKE_WIDTH = 5.0f;
 
     private static final int VALID_COLOR = Color.GREEN;
@@ -100,7 +98,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
 
-        canvas.drawText(mIsReady ? mReadyMessage : mNotReadyMessage, left, top - 50.0f, mPaint);
+        canvas.drawText(mIsReady ? mReadyMessage : mNotReadyMessage, left, top - LABEL_Y_OFFSET, mPaint);
 
         canvas.drawRect(left, top, right, bottom, mPaint);
     }
