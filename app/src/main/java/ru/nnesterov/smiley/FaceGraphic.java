@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.gms.samples.vision.face.facetracker;
+package ru.nnesterov.smiley;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import com.google.android.gms.samples.vision.face.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.face.Face;
+
+import ru.nnesterov.smiley.ui.camera.GraphicOverlay;
 
 /**
  * Graphic instance for rendering face position, orientation, and landmarks within an associated
@@ -33,46 +34,36 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private static final float ID_X_OFFSET = -50.0f;
     private static final float BOX_STROKE_WIDTH = 5.0f;
 
-    private static final int COLOR_CHOICES[] = {
-        Color.BLUE,
-        Color.CYAN,
-        Color.GREEN,
-        Color.MAGENTA,
-        Color.RED,
-        Color.WHITE,
-        Color.YELLOW
-    };
-    private static int mCurrentColorIndex = 0;
+    private static final int VALID_COLOR = Color.GREEN;
+    private static final int INVALID_COLOR = Color.RED;
 
-    private Paint mFacePositionPaint;
-    private Paint mIdPaint;
-    private Paint mBoxPaint;
+    private Paint mPaint;
 
     private volatile Face mFace;
     private int mFaceId;
-    private float mFaceHappiness;
+    private boolean mIsReady = false;
+    private final String mNotReadyMessage;
+    private final String mReadyMessage;
 
     FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
-
-        mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
-        final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
-
-        mFacePositionPaint = new Paint();
-        mFacePositionPaint.setColor(selectedColor);
-
-        mIdPaint = new Paint();
-        mIdPaint.setColor(selectedColor);
-        mIdPaint.setTextSize(ID_TEXT_SIZE);
-
-        mBoxPaint = new Paint();
-        mBoxPaint.setColor(selectedColor);
-        mBoxPaint.setStyle(Paint.Style.STROKE);
-        mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        mNotReadyMessage = overlay.getContext().getResources().getString(R.string.not_ready_message);
+        mReadyMessage = overlay.getContext().getResources().getString(R.string.ready_message);
+        mPaint = new Paint();
+        mPaint.setColor(INVALID_COLOR);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        mPaint.setTextSize(ID_TEXT_SIZE);
     }
 
     void setId(int id) {
         mFaceId = id;
+    }
+
+
+    void setmIsReady(boolean isValid) {
+        this.mIsReady = isValid;
+        mPaint.setColor(isValid ? VALID_COLOR : INVALID_COLOR);
     }
 
 
@@ -98,11 +89,12 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
-        canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
-        canvas.drawText("left eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mIdPaint);
+        canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mPaint);
+        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mPaint);
+        canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mPaint);
+        canvas.drawText("left eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mPaint);
+
+            canvas.drawText(mIsReady ? mReadyMessage : mNotReadyMessage, 50.0f, 50.0f, mPaint);
 
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);
@@ -111,6 +103,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-        canvas.drawRect(left, top, right, bottom, mBoxPaint);
+        canvas.drawRect(left, top, right, bottom, mPaint);
     }
 }
