@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -38,6 +39,7 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.File;
 import java.io.IOException;
 
 import ru.nnesterov.smiley.ui.camera.CameraSourcePreview;
@@ -262,13 +264,20 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     }
 
     private void takeShot() {
-        mPreview.stop();
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes) {
+                mPreview.stop();
+                File shot = null;
+                try {
+                    shot = FileUtils.saveImage(bytes, "jpg");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("image/jpeg");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, bytes);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(shot));
                 startActivity(Intent.createChooser(shareIntent, ""));
             }
         });
